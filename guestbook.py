@@ -20,9 +20,11 @@ import webapp2
 from google.appengine.ext import db
 from google.appengine.api import users
 
-class Greeting(db.Model):
-  author = db.UserProperty()
-  content = db.StringProperty(multiline=True)
+class Calculation(db.Model):
+  firstNum = db.FloatProperty()
+  secondNum = db.FloatProperty() 
+  operation = db.StringProperty()
+  result = db.FloatProperty()
   date = db.DateTimeProperty(auto_now_add=True)
 
 
@@ -30,14 +32,14 @@ class MainPage(webapp2.RequestHandler):
   def get(self):
     self.response.out.write('<html><body>')
 
-#    greetings = db.GqlQuery("SELECT * "
-#                            "FROM Greeting "
-#                            "ORDER BY date DESC LIMIT 10")
-#
-#    for greeting in greetings:
-#      if greeting.author:
-#        self.response.out.write('<b>%s</b> wrote:' % greeting.author.nickname())
-#      else:
+    calculations = db.GqlQuery("SELECT * "
+                            "FROM Calculation "
+                            "ORDER BY date ASC LIMIT 10")
+
+    for calc in calculations:
+      self.response.out.write("<div>%s %s %s = %s</div>" % (calc.firstNum,calc.operation,
+                                                            calc.secondNum,calc.result))
+
 #        self.response.out.write('An anonymous person wrote:')
 #      self.response.out.write('<blockquote>%s</blockquote>' %
 #                              cgi.escape(greeting.content))
@@ -47,8 +49,8 @@ class MainPage(webapp2.RequestHandler):
           <form action="/add" method="post">
             <div><input name ="firstNum" type="text"/></div>
             <div><input name="secondNum" type="text"/></div>
-            <div><input name="addButton" type="submit" value="add values"></div>
-            <div><input name="subtractButton" type="submit" value="subtract  values"></div>
+            <div><input name="addButton" type="submit" value="Add Values"></div>
+            <div><input name="subtractButton" type="submit" value="Subtract Values"></div>
           </form>
         </body>
       </html>""")
@@ -56,23 +58,26 @@ class MainPage(webapp2.RequestHandler):
 
 class Adder(webapp2.RequestHandler):
   def post(self):
-    # greeting = Greeting()
-    # if users.get_current_user():
-    #   greeting.author = users.get_current_user()
 
-    # greeting.content = self.request.get('content')
-    # greeting.put()
-    # self.redirect('/')
+    newCalc = Calculation()
     addButtonClicked = self.request.get('addButton')
     try:
-      firstNum = int (self.request.get('firstNum'))
-      secondNum = int (self.request.get('secondNum'))
+      firstNum = float (self.request.get('firstNum'))
+      secondNum = float (self.request.get('secondNum'))
     except ValueError:
-      self.response.out.write('Please use only numbers!!')
+      self.response.out.write('Please use only umbers!')
+    newCalc.firstNum = firstNum
+    newCalc.secondNum = secondNum
     if addButtonClicked:
-      self.response.out.write(firstNum+secondNum)
+      newCalc.operation = "+"
+      newCalc.result = firstNum+secondNum
     else:
-      self.response.out.write(firstNum-secondNum)
+     
+      newCalc.operation = "-"
+      newCalc.result = firstNum-secondNum
+
+    newCalc.put()
+    self.redirect('/')
 # Cool story bro.
 
 app = webapp2.WSGIApplication([
