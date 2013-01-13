@@ -43,7 +43,7 @@ class MainPage(webapp2.RequestHandler):
     self.response.out.write("These are the scouts in the troop so far.")
     self.response.out.write("<br>")
 
-    scouts =  list (db.GqlQuery("SELECT * FROM Scout"))
+    scouts =  db.GqlQuery("SELECT * FROM Scout").run()
 
     for scout in scouts:
       self.response.out.write("<a href='" + scout.get_url() + "'>" + scout.name + "</a>" ) 
@@ -88,7 +88,7 @@ class ScoutPage (webapp2.RequestHandler):
 <input type='hidden' name='scout_key' value='""" + str(scout.key()) + """'/>
 <div>Rank</div><select name='rank_name'>""")
     for rank in RANKS:
-      self.response.out.write("<option value="+rank+">"+rank+"</option>")
+      self.response.out.write("<option value='"+rank+"'>"+rank+"</option>")
     self.response.out.write("""</select>
 <div>Date Earned(mm/dd/yy)</div>
 <input type='text' name='date_earned'/>
@@ -96,6 +96,11 @@ class ScoutPage (webapp2.RequestHandler):
 <input type='text' name='signature'/>
 <button type='submit'>Create Rank</button>
 </form>""")
+
+    for rank in scout.rank_set.run():
+      self.response.out.write(rank.name)
+      self.response.out.write("<br>")
+
 class DeletePage (webapp2.RequestHandler):
   def post(self):
     k = self.request.get("scout_key")
