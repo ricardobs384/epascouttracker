@@ -17,6 +17,8 @@ import cgi
 import datetime
 import webapp2
 import logging
+import os
+from google.appengine.ext.webapp import template
 
 from google.appengine.ext import db
 from google.appengine.api import users
@@ -38,15 +40,13 @@ class Rank (db.Model):
 
 class MainPage(webapp2.RequestHandler):
   def get(self):
-    self.response.out.write("These are the scouts in the troop so far.")
-    self.response.out.write("<br>")
 
     scouts =  db.GqlQuery("SELECT * FROM Scout").run()
 
-    for scout in scouts:
-      self.response.out.write("<a href='" + scout.get_url() + "'>" + scout.name + "</a>" ) 
-      self.response.out.write("<br>")
-    self.response.out.write("<a href='/add'>Click to add a scout</a>")
+    
+
+    path = os.path.join(os.path.dirname(__file__),'mainpage.html')
+    self.response.out.write(template.render(path,{'scouts':scouts}))
 
 class ScoutForm(webapp2.RequestHandler):
   def get(self):

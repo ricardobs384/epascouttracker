@@ -1,0 +1,7 @@
+These are the scouts in the troop so far.
+<br>
+{% for scout in scouts  %}
+  <a href=" {{scout.get_url}} ">  {{scout.name}}</a> 
+  <br>
+{% endfor %}
+<a href='/add'>Click to add a scout</a>
