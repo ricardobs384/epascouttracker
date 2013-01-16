@@ -21,7 +21,7 @@ import logging
 from google.appengine.ext import db
 from google.appengine.api import users
 
-RANKS = ["TenderFoot", "Second Class" , "First Class", "Star", "Life", "Eagle"]
+RANKS = ["Tender Foot", "Second Class" , "First Class", "Star", "Life", "Eagle"]
 
 class Scout (db.Model):
   name = db.StringProperty()
@@ -38,8 +38,6 @@ class Rank (db.Model):
 
 class MainPage(webapp2.RequestHandler):
   def get(self):
-    self.response.out.write("<a href='/add'>Click to add a scout</a>")
-    self.response.out.write("<br>")
     self.response.out.write("These are the scouts in the troop so far.")
     self.response.out.write("<br>")
 
@@ -48,8 +46,7 @@ class MainPage(webapp2.RequestHandler):
     for scout in scouts:
       self.response.out.write("<a href='" + scout.get_url() + "'>" + scout.name + "</a>" ) 
       self.response.out.write("<br>")
-
-
+    self.response.out.write("<a href='/add'>Click to add a scout</a>")
 
 class ScoutForm(webapp2.RequestHandler):
   def get(self):
@@ -78,7 +75,7 @@ class ScoutPage (webapp2.RequestHandler):
     self.response.out.write(scout.name + " joined on " + str(scout.start_date)) 
     
     self.response.out.write("""
-<form method='post' action='/delete'>
+<form method='post' action='/delete_scout'>
 <input type='hidden' name='scout_key' value='""" + str(scout.key()) + """'/>
 <button type='submit'>Delete</button>
 </form>""")
@@ -96,17 +93,31 @@ class ScoutPage (webapp2.RequestHandler):
 <input type='text' name='signature'/>
 <button type='submit'>Create Rank</button>
 </form>""")
-
+    
+    self.response.out.write("These are the ranks that " + scout.name  + " has earned:<br>")
     for rank in scout.rank_set.run():
-      self.response.out.write(rank.name)
+      self.response.out.write(rank.name + " " + str(rank.date) + " " + rank.signature)
+      self.response.out.write("""
+<form method='post' action='/delete_rank'>
+<input type='hidden' name='rank_key' value='""" + str(rank.key()) + """'>
+<button type='submit'>Delete</button>
+</form>
+""")
       self.response.out.write("<br>")
 
-class DeletePage (webapp2.RequestHandler):
+class ScoutDeletePage (webapp2.RequestHandler):
   def post(self):
     k = self.request.get("scout_key")
     scout =  Scout.get(k)
     scout.delete()
     self.redirect("/")
+
+class RankDeletePage (webapp2.RequestHandler):
+  def post(self):
+    k = self.request.get("rank_key")
+    rank = Rank.get(k)
+    rank.delete()
+    self.redirect(rank.scout.get_url())
 
 class AddRank (webapp2.RequestHandler):
   def post(self):
@@ -118,13 +129,13 @@ class AddRank (webapp2.RequestHandler):
     rank.scout = Scout.get(self.request.get("scout_key"))
     rank.put()
     self.redirect(rank.scout.get_url())
-
                         
 logging.getLogger().setLevel(logging.DEBUG)
 app = webapp2.WSGIApplication([
   ('/', MainPage),
   ('/add', ScoutForm),
   ('/scout',ScoutPage),
-  ('/delete',DeletePage),
-  ('/rank',AddRank)
+  ('/delete_scout',ScoutDeletePage),
+  ('/rank',AddRank),
+  ('/delete_rank',RankDeletePage)
 ], debug=True)
