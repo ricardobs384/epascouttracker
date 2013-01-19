@@ -40,10 +40,7 @@ class Rank (db.Model):
 
 class MainPage(webapp2.RequestHandler):
   def get(self):
-
     scouts =  db.GqlQuery("SELECT * FROM Scout").run()
-
-    
 
     path = os.path.join(os.path.dirname(__file__),'mainpage.html')
     self.response.out.write(template.render(path,{'scouts':scouts}))

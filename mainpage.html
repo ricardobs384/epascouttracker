@@ -1,3 +1,6 @@
+{% extends "base.html" %}
+
+{% block content %}
 These are the scouts in the troop so far.
 <br>
 {% for scout in scouts  %}
@@ -5,3 +8,4 @@ These are the scouts in the troop so far.
   <br>
 {% endfor %}
 <a href='/add'>Click to add a scout</a>
+{% endblock %}
