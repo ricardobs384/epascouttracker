@@ -47,15 +47,9 @@ class MainPage(webapp2.RequestHandler):
 
 class ScoutForm(webapp2.RequestHandler):
   def get(self):
-    self.response.out.write("""
-<form method='post'>
-  <div>Scout Name</div>
-  <input type='text' name='scout_name'/>
-  <div>Start Date (mm/dd/yy)</div>
-  <input type='text' name='date_started'/>
-  <button type='submit'>Add Scout</button>
-</form>
-""")
+    path = os.path.join(os.path.dirname(__file__),'addscoutpage.html')
+    self.response.out.write(template.render(path,{}))
+   
   def post(self):
     name = self.request.get("scout_name")
     date = self.request.get("date_started")
@@ -65,42 +59,14 @@ class ScoutForm(webapp2.RequestHandler):
     scout.start_date = datetime.datetime.strptime(date,'%x').date()
     scout.put()
     self.redirect("/")
-
+   
 class ScoutPage (webapp2.RequestHandler):
   def get(self):
     scout = Scout.get(self.request.get("id"))
-    self.response.out.write(scout.name + " joined on " + str(scout.start_date)) 
     
-    self.response.out.write("""
-<form method='post' action='/delete_scout'>
-<input type='hidden' name='scout_key' value='""" + str(scout.key()) + """'/>
-<button type='submit'>Delete</button>
-</form>""")
+    path = os.path.join(os.path.dirname(__file__),'scoutpage.html')
+    self.response.out.write(template.render(path,{'scout':scout,'all_ranks':RANKS}))
 
-    self.response.out.write("""
-<form method='post' action='/rank'>
-<input type='hidden' name='scout_key' value='""" + str(scout.key()) + """'/>
-<div>Rank</div><select name='rank_name'>""")
-    for rank in RANKS:
-      self.response.out.write("<option value='"+rank+"'>"+rank+"</option>")
-    self.response.out.write("""</select>
-<div>Date Earned(mm/dd/yy)</div>
-<input type='text' name='date_earned'/>
-<div>Signature</div>
-<input type='text' name='signature'/>
-<button type='submit'>Create Rank</button>
-</form>""")
-    
-    self.response.out.write("These are the ranks that " + scout.name  + " has earned:<br>")
-    for rank in scout.rank_set.run():
-      self.response.out.write(rank.name + " " + str(rank.date) + " " + rank.signature)
-      self.response.out.write("""
-<form method='post' action='/delete_rank'>
-<input type='hidden' name='rank_key' value='""" + str(rank.key()) + """'>
-<button type='submit'>Delete</button>
-</form>
-""")
-      self.response.out.write("<br>")
 
 class ScoutDeletePage (webapp2.RequestHandler):
   def post(self):
