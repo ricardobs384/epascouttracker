@@ -22,16 +22,24 @@ from google.appengine.ext.webapp import template
 
 from google.appengine.ext import db
 from google.appengine.api import users
+from google.appengine.ext import blobstore
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
+
 
 RANKS = ["Tender Foot", "Second Class" , "First Class", "Star", "Life", "Eagle"]
 
 class Scout (db.Model):
   name = db.StringProperty()
   start_date = db.DateProperty()
+  picture = blobstore.BlobReferenceProperty()
   def get_url(self):
     url = "/scout?id="+str(self.key())
     return url
-  
+  def image_url(self):
+    url ="/scout_image?id="+str(self.key())
+    return url
+
 class Rank (db.Model):
   name = db.StringProperty()
   signature = db.StringProperty()
@@ -63,10 +71,32 @@ class ScoutForm(webapp2.RequestHandler):
 class ScoutPage (webapp2.RequestHandler):
   def get(self):
     scout = Scout.get(self.request.get("id"))
-    
+    upload_url = blobstore.create_upload_url('/upload')
     path = os.path.join(os.path.dirname(__file__),'scoutpage.html')
-    self.response.out.write(template.render(path,{'scout':scout,'all_ranks':RANKS}))
+    self.response.out.write(template.render(path,{
+      'scout':scout,
+      'all_ranks':RANKS,
+      'upload_url':upload_url}))
 
+
+
+class ImageUploadHandler (blobstore_handlers.BlobstoreUploadHandler):
+  def post(self):
+    uploads = self.get_uploads('file')
+    scout = Scout.get(self.request.get("scout_key"))
+    if uploads:
+      image = uploads [0]
+      scout.picture = image
+      scout.put()
+    self.redirect(scout.get_url())
+    
+
+class ServiceImageHandler (blobstore_handlers.BlobstoreDownloadHandler):
+  def get(self):
+    key = self.request.get("id")
+    scout = Scout.get(key)
+    self.send_blob(scout.picture)
+    
 
 class ScoutDeletePage (webapp2.RequestHandler):
   def post(self):
@@ -100,5 +130,8 @@ app = webapp2.WSGIApplication([
   ('/scout',ScoutPage),
   ('/delete_scout',ScoutDeletePage),
   ('/rank',AddRank),
-  ('/delete_rank',RankDeletePage)
+  ('/delete_rank',RankDeletePage),
+  ('/upload',ImageUploadHandler),
+  ('/scout_image',ServiceImageHandler)
+
 ], debug=True)

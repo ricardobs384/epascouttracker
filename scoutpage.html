@@ -3,6 +3,14 @@
 {% block content %}
 {{ scout.name }} joined on {{scout.start_date}}
 
+<img src="{{scout.image_url}}" id="scout_picture"/>
+<form method="post" action="{{upload_url}}" enctype="multipart/form-data">
+<input type="file" name="file"/>
+<input type='hidden' name='scout_key' value="{{scout.key}}"/>
+<button type="submit">Upload Picture</button>
+</form>
+
+
 <form method='post' action='/delete_scout'>
 <input type='hidden' name='scout_key' value="{{scout.key}}"/>
 <button type='submit'>Delete</button>
