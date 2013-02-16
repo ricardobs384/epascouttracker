@@ -1,9 +1,23 @@
 {% extends 'base.html'  %}
 
 {% block content %}
-{{ scout.name }} joined on {{scout.start_date}}
 
+<div id="scoutpage_content">
 <img src="{{scout.image_url}}" id="scout_picture"/>
+<br>
+<b>{{ scout.name }} joined on {{scout.start_date}}</b>
+<br>
+<em>These are the ranks that {{scout.name}} has earned:</em><br>
+{% for rank in scout.rank_set.run %}
+<b>{{rank.name}} {{rank.date}}</b><em> {{rank.signature}}</em>
+  <form method='post' action='/delete_rank'>
+  <input type='hidden' name='rank_key' value="{{rank.key}}">
+  <button type='submit'>Delete</button>
+  </form>
+{% endfor  %}
+</div>
+<br>
+
 <form method="post" action="{{upload_url}}" enctype="multipart/form-data">
 <input type="file" name="file"/>
 <input type='hidden' name='scout_key' value="{{scout.key}}"/>
@@ -13,7 +27,7 @@
 
 <form method='post' action='/delete_scout'>
 <input type='hidden' name='scout_key' value="{{scout.key}}"/>
-<button type='submit'>Delete</button>
+<button type='submit'>Delete Scout</button>
 </form>
 
 <form method='post' action='/rank'>
@@ -31,16 +45,5 @@
 <input type='text' name='signature'/>
 <button type='submit'>Create Rank</button>
 </form>
-
-These are the ranks that {{scout.name}} has earned:<br/>
-{% for rank in scout.rank_set.run %}
-  {{rank.name}}  {{rank.date}} {{rank.signature}}
-
-<form method='post' action='/delete_rank'>
-<input type='hidden' name='rank_key' value="{{rank.key}}">
-<button type='submit'>Delete</button>
-</form>
-<br/>
- {% endfor  %}
 
 {% endblock  %}

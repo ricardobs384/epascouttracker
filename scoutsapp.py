@@ -29,6 +29,27 @@ from google.appengine.ext.webapp import blobstore_handlers
 
 RANKS = ["Tender Foot", "Second Class" , "First Class", "Star", "Life", "Eagle"]
 
+def admin_only(function):
+  def auth_func(self):
+    if users.is_current_user_admin():
+      return function(self)
+    else:
+      self.redirect(users.create_login_url(self.request.url))
+
+  return auth_func 
+
+
+def authenticated(function):
+  def auth_func(self):
+    user = users.get_current_user()
+    if user:
+      return function(self)
+    else:
+      self.redirect(users.create_login_url(self.request.url))
+
+  return auth_func 
+
+
 class Scout (db.Model):
   name = db.StringProperty()
   start_date = db.DateProperty()
@@ -47,17 +68,25 @@ class Rank (db.Model):
   scout = db.ReferenceProperty(Scout)
 
 class MainPage(webapp2.RequestHandler):
+  @authenticated
   def get(self):
     scouts =  db.GqlQuery("SELECT * FROM Scout").run()
-
+    user = users.get_current_user()
     path = os.path.join(os.path.dirname(__file__),'mainpage.html')
-    self.response.out.write(template.render(path,{'scouts':scouts}))
+    self.response.out.write(template.render(path,{
+            'logout_url':users.create_logout_url("/"),
+            'user':user,
+            'scouts':scouts
+            }))
+    
+
 
 class ScoutForm(webapp2.RequestHandler):
   def get(self):
     path = os.path.join(os.path.dirname(__file__),'addscoutpage.html')
     self.response.out.write(template.render(path,{}))
    
+  @admin_only
   def post(self):
     name = self.request.get("scout_name")
     date = self.request.get("date_started")
@@ -69,6 +98,7 @@ class ScoutForm(webapp2.RequestHandler):
     self.redirect("/")
    
 class ScoutPage (webapp2.RequestHandler):
+  @authenticated
   def get(self):
     scout = Scout.get(self.request.get("id"))
     upload_url = blobstore.create_upload_url('/upload')
@@ -77,8 +107,6 @@ class ScoutPage (webapp2.RequestHandler):
       'scout':scout,
       'all_ranks':RANKS,
       'upload_url':upload_url}))
-
-
 
 class ImageUploadHandler (blobstore_handlers.BlobstoreUploadHandler):
   def post(self):

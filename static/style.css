@@ -10,17 +10,32 @@ body{
     width:960px;
     margin:auto;
     padding:30px;
-    border:5px dotted green;
+    border-left:5px dotted green;
+    border-right:5px dotted green;
+    border-bottom:5px dotted green;
 }
 
-#scout_picture
-{
+#header{
+margin-left:300px;
+}
+
+#scout_picture{
 max-width:100px;
 max-height:100px;
+float:left;
 }
 
-a
+#scoutpage_content
 {
+border-bottom:3px dotted red;
+}
+
+#these_are{
+border-bottom:1px dotted blue;
+width:310px;
+}
+
+a{
 color:black;
 text-decoration:none;
 }
