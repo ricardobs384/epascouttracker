@@ -73,10 +73,12 @@ class MainPage(webapp2.RequestHandler):
     scouts =  db.GqlQuery("SELECT * FROM Scout").run()
     user = users.get_current_user()
     path = os.path.join(os.path.dirname(__file__),'mainpage.html')
+    message = self.request.get('message')
     self.response.out.write(template.render(path,{
             'logout_url':users.create_logout_url("/"),
             'user':user,
-            'scouts':scouts
+            'scouts':scouts,
+            'message':message
             }))
 
 class ScoutForm(webapp2.RequestHandler):
