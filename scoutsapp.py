@@ -78,8 +78,6 @@ class MainPage(webapp2.RequestHandler):
             'user':user,
             'scouts':scouts
             }))
-    
-
 
 class ScoutForm(webapp2.RequestHandler):
   def get(self):
@@ -108,7 +106,10 @@ class ScoutPage (webapp2.RequestHandler):
       'all_ranks':RANKS,
       'upload_url':upload_url}))
 
+
+
 class ImageUploadHandler (blobstore_handlers.BlobstoreUploadHandler):
+  @admin_only
   def post(self):
     uploads = self.get_uploads('file')
     scout = Scout.get(self.request.get("scout_key"))
@@ -127,13 +128,15 @@ class ServiceImageHandler (blobstore_handlers.BlobstoreDownloadHandler):
     
 
 class ScoutDeletePage (webapp2.RequestHandler):
-  def post(self):
+ @admin_only
+ def post(self):
     k = self.request.get("scout_key")
     scout =  Scout.get(k)
     scout.delete()
     self.redirect("/")
 
 class RankDeletePage (webapp2.RequestHandler):
+  @admin_only
   def post(self):
     k = self.request.get("rank_key")
     rank = Rank.get(k)
@@ -141,6 +144,7 @@ class RankDeletePage (webapp2.RequestHandler):
     self.redirect(rank.scout.get_url())
 
 class AddRank (webapp2.RequestHandler):
+  @admin_only
   def post(self):
     #first create a rank 
     rank = Rank() 

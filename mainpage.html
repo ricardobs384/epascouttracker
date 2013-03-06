@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-You are logged in as {{user.nickname}} :)
-<a href="{{logout_url}}">Logout</a>
 
 <div id="these_are"><b>These are the scouts in the troop so far.</b></div>
 
@@ -10,6 +8,10 @@ You are logged in as {{user.nickname}} :)
   <a href=" {{scout.get_url}} "><em>{{scout.name}}</b></a> 
   <br>
 {% endfor %}
-<br>
 <a href='/add'>Click to add a scout</a>
+<br>
+<img src="http://www.sgvcbsa.org/files/images/logos/BSALG2K.jpg" id="homescreen_pic">
+</em>
+<br> You are logged in as {{user.nickname}}
+<br><em><a href="{{logout_url}}">Logout</a></em>
 {% endblock %}

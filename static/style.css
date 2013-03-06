@@ -1,28 +1,29 @@
 body{
     background-color:#F0F8FF;
-    font-family:'Trebuchet MS',Helvetica, 'sans-serif';
+    font-family:'Trebuchet MS','Helvetica', 'sans-serif';
     margin:0px;
+}
+
+#homescreen_pic{
+padding-left:310px;
+max-width:200px;
+max-height:200px;
 }
 
 #content{
     background-color:white;
     text-align:left;
-    width:960px;
+    width:800px;
     margin:auto;
     padding:30px;
     border-left:5px dotted green;
     border-right:5px dotted green;
-    border-bottom:5px dotted green;
-}
-
-#header{
-margin-left:300px;
+    border-bottom:5px dotted green;    
 }
 
 #scout_picture{
 max-width:100px;
 max-height:100px;
-float:left;
 }
 
 #scoutpage_content
@@ -38,4 +39,13 @@ width:310px;
 a{
 color:black;
 text-decoration:none;
+}
+
+#picture_cell{
+vertical-align:text-top;
+padding-right:10px;
+}
+
+#headerz{
+margin-left:300px
 }

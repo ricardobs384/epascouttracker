@@ -3,18 +3,20 @@
 {% block content %}
 
 <div id="scoutpage_content">
+<table><tr><td id="picture_cell">
 <img src="{{scout.image_url}}" id="scout_picture"/>
-<br>
+<br></td><td>
 <b>{{ scout.name }} joined on {{scout.start_date}}</b>
 <br>
 <em>These are the ranks that {{scout.name}} has earned:</em><br>
 {% for rank in scout.rank_set.run %}
-<b>{{rank.name}} {{rank.date}}</b><em> {{rank.signature}}</em>
+<b>{{rank.name}} </b> {{rank.date}}<em> {{rank.signature}}</em>
   <form method='post' action='/delete_rank'>
   <input type='hidden' name='rank_key' value="{{rank.key}}">
   <button type='submit'>Delete</button>
   </form>
 {% endfor  %}
+</td></tr></table>
 </div>
 <br>
 
